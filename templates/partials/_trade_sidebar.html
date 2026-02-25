@@ -1,0 +1,70 @@
+{% from "partials/_market_order_section.html" import market_order_section %}
+{% from "partials/_limit_order_section.html" import limit_order_section %}
+
+{% macro trade_sidebar(side, ticker, balance, balance_label, balance_unit) %}
+<div class="offcanvas offcanvas-end d-flex flex-column p-3" tabindex="-1" id="{{ side }}Sidebar" style="width: 450px;">
+    <div class="offcanvas-body d-flex flex-column">
+
+        <!-- Header -->
+        <div class="mt-4">
+            <h5 class="text-center fw-bold" id="{{ side }}SidebarTitle">
+                {{ side|capitalize }}ing {{ ticker }}
+            </h5>
+
+            <!-- Balance Display -->
+            <p class="text-center my-3 p-2 rounded bg-light">
+                <i class="bi bi-wallet me-1"></i>
+                {{ balance_label }}:
+                <strong id="{{ side }}UserBalanceAmount">
+                    {% if side == 'buy' %}
+                    {{ balance | usd}}
+
+                    {% elif side == 'sell' %}
+                    {{ balance }} {{ balance_unit }}
+
+                    {% endif %}
+                </strong>
+            </p>
+        </div>
+
+        <!-- Main Form -->
+        <form class="flex-grow-1" id="{{ side }}Form" method="POST" action="/{{ side }}/{{ ticker }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <input type="hidden" name="order_type" id="{{ side }}OrderTypeInput">
+            <input type="hidden" name="shares" id="{{ side }}SharesInput">
+            <input type="hidden" name="limit_price" id="{{ side }}LimitPriceHiddenInput">
+
+            <!-- Order Type Selector -->
+            <div class="my-3 d-flex align-items-center justify-content-between" id="{{ side }}OrderTypeSection">
+                <h6 class="fw-semibold mb-0">Order Type</h6>
+                <select class="form-select w-auto ms-3" id="{{ side }}OrderTypeSelect">
+                    <option value="" selected disabled>Select</option>
+                    <option value="market">Market Price</option>
+                    <option value="limit">Limit Order</option>
+                </select>
+            </div>
+
+            <hr class="my-2 border-opacity-25">
+
+            <!-- MARKET ORDER SECTION -->
+            {{ market_order_section(side) }}
+
+            <!-- LIMIT ORDER SECTION -->
+            {{ limit_order_section(side) }}
+
+        </form>
+
+        <!-- Footer: Action Buttons -->
+        <div class="mt-auto pt-3" id="actionButtons">
+            <button type="button" class="btn btn-dark w-100 py-2 mb-2" id="confirm{{ side|capitalize }}OrderBtn">
+                Confirm Order
+            </button>
+            <button type="button" class="btn w-100 py-2" data-bs-dismiss="offcanvas"
+                id="cancel{{ side|capitalize }}OrderBtn">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
+{% endmacro %}

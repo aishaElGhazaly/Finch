@@ -1,0 +1,402 @@
+{% extends "layout.html" %}
+{% block title %}Holdings | Finch{% endblock %}
+
+{% block content %}
+<main class="container my-4">
+
+    <!-- Header -->
+    <div class="mb-4">
+        <h2 class="fw-bold m-0">Holdings</h2>
+        <p class="text-muted mb-0">
+            Your portfolio positions and performance.
+        </p>
+    </div>
+
+    {% if holdings|length > 0 %}
+
+    <!-- ================= PORTFOLIO SUMMARY ================= -->
+    <div class="row g-3 g-md-4 mb-4 justify-content-center">
+
+        <!-- Positions -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card h-100 text-center shadow-sm border-0 rounded-4">
+                <div class="card-body py-4">
+
+                    <div class="card-label">
+                        Positions
+                    </div>
+
+                    <div class="card-value" id="card-holdings">
+                        {{ holdings|length }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Portfolio Value -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card h-100 text-center shadow-sm border-0 rounded-4">
+                <div class="card-body py-4">
+                    <div class="card-label">
+                        Portfolio Value
+                    </div>
+
+                    <div class="card-value" id="card-value">
+                        {{ total_portfolio | usd }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Total P/L -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card h-100 text-center shadow-sm border-0 rounded-4">
+                <div class="card-body py-4">
+                    <div class="card-label">
+                        Total P/L
+                    </div>
+
+                    <div class="card-value" id="card-unrealized">
+                        {{ unrealized | usd }}
+                        <span class="card-pct">
+                            ({{ unrealized_pct }}%)
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Today -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card h-100 text-center shadow-sm border-0 rounded-4">
+                <div class="card-body py-4">
+                    <div class="card-label">
+                        Today
+                    </div>
+
+                    <div class="card-value" id="card-today">
+                        {{ today_pl | usd }}
+                        <span class="card-pct">
+                            ({{ today_pct }}%)
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Controls -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body py-3">
+
+            <div class="row g-3 align-items-center">
+
+                <!-- Search -->
+                <div class="col-12 col-md-3 order-1 order-md-2">
+                    <input type="text" id="hSearch" class="form-control search-pill" placeholder="Search">
+                </div>
+
+                <!-- Sector filters -->
+                <div class="col-12 col-md-9 order-2 order-md-1">
+                    <div id="hSectorFilters" class="d-flex flex-wrap gap-2 filterChips">
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- Meta -->
+    <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+
+        <div class="text-muted small">
+            <span id="hCount">{{ holdings|length }}</span>
+            positions • Updates every 60 seconds
+        </div>
+
+    </div>
+
+
+    <!-- ================= DESKTOP / TABLET ================= -->
+    <div class="d-none d-md-block table-responsive shadow-sm rounded-4">
+
+        <table class="table modern-table mb-0 align-middle">
+
+            <thead>
+                <tr>
+
+                    <th>Stock</th>
+
+                    <th class="text-end sortable" data-sort="shares">
+                        Shares <span class="sort-indicator"></span>
+                    </th>
+
+                    <th class="text-end sortable" data-sort="avg">
+                        Avg Cost <span class="sort-indicator"></span>
+                    </th>
+
+                    <th class="text-end sortable" data-sort="price">
+                        Price <span class="sort-indicator"></span>
+                    </th>
+
+                    <th class="text-end sortable" data-sort="value">
+                        Market Value <span class="sort-indicator"></span>
+                    </th>
+
+                    <th class="text-end sortable" data-sort="pl">
+                        Total P/L <span class="sort-indicator"></span>
+                    </th>
+
+                    <th class="text-end sortable" data-sort="day">
+                        Today <span class="sort-indicator"></span>
+                    </th>
+
+                    <th class="text-end sortable" data-sort="weight">
+                        Weight % <span class="sort-indicator"></span>
+                    </th>
+
+                </tr>
+            </thead>
+
+
+            <tbody id="hTableBody">
+
+                {% for h in holdings %}
+
+                <tr class="clickable-row" data-symbol="{{ h.symbol }}" data-sector="{{ h.sector }}"
+                    data-name="{{ h.name|lower }}" data-shares="{{ h.shares }}" data-avg="{{ h.avg_price }}"
+                    data-price="{{ h.price }}" data-value="{{ h.market_value }}" data-pl="{{ h.unrealized_pl }}"
+                    data-day="{{ h.today_pl }}" data-weight="{{ h.weight_pct }}">
+
+                    <!-- Asset -->
+                    <td>
+                        <div class="d-flex align-items-center gap-3">
+
+                            <img src="https://img.logo.dev/ticker/{{ h.symbol }}?token=pk_StdhioHKQAapZCwTkZ1bgA"
+                                class="rounded-circle flex-shrink-0" style="width:40px;height:40px" loading="lazy"
+                                onerror="this.style.display='none'">
+
+                            <div>
+                                <div class="fw-semibold">{{ h.symbol }}</div>
+                                <div class="text-muted small">{{ h.name }}</div>
+                            </div>
+
+                        </div>
+                    </td>
+
+
+                    <!-- Shares -->
+                    <td class="text-end fw-semibold">
+                        {{ h.shares }}
+                    </td>
+
+
+                    <!-- Avg -->
+                    <td class="text-end fw-semibold">
+                        {{ h.avg_price | usd }}
+                    </td>
+
+
+                    <!-- Price -->
+                    <td class="text-end fw-semibold" data-price-cell>
+                        {{ h.price | usd }}
+                    </td>
+
+
+                    <!-- Value -->
+                    <td class="text-end fw-semibold" data-value-cell>
+                        {{ h.market_value | usd }}
+                    </td>
+
+
+                    <!-- P/L -->
+                    <td class="text-end fw-semibold data-pl-cell
+                    {% if h.unrealized_pl >= 0 %}
+                        text-success
+                    {% else %}
+                        text-danger
+                    {% endif %}">
+
+                        {% if h.unrealized_pl >= 0 %}+{% endif %}
+                        {{ h.unrealized_pl | usd }}
+                        ({{ h.unrealized_pct }}%)
+
+                    </td>
+
+
+                    <!-- Today -->
+                    <td class="text-end fw-semibold data-day-cell
+                    {% if h.today_pl >= 0 %}
+                        text-success
+                    {% else %}
+                        text-danger
+                    {% endif %}">
+
+                        {% if h.today_pl >= 0 %}+{% endif %}
+                        {{ h.today_pl | usd }}
+                        ({{ h.today_pct }}%)
+
+                    </td>
+
+
+                    <!-- Weight -->
+                    <td class="text-end fw-semibold" data-weight-cell>
+                        {{ h.weight_pct }}%
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- ================= MOBILE ================= -->
+    <div class="d-md-none">
+
+        {% for h in holdings %}
+
+        <div class="card mb-3 shadow-sm rounded-3 clickable-row" data-symbol="{{ h.symbol }}"
+            data-sector="{{ h.sector }}" data-name="{{ h.name|lower }}" data-shares="{{ h.shares }}"
+            data-avg="{{ h.avg_price }}" data-price="{{ h.price }}" data-value="{{ h.market_value }}"
+            data-pl="{{ h.unrealized_pl }}" data-weight="{{ h.weight_pct }}" data-day="{{ h.today_pl }}">
+
+            <div class="card-body py-3 px-3">
+
+
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+
+                    <div class="d-flex align-items-center gap-3">
+
+                        <img src="https://img.logo.dev/ticker/{{ h.symbol }}?token=pk_StdhioHKQAapZCwTkZ1bgA"
+                            class="rounded-circle flex-shrink-0" style="width:32px;height:32px" loading="lazy"
+                            onerror="this.style.display='none'">
+
+                        <div>
+                            <div class="fw-semibold">{{ h.symbol }}</div>
+                            <div class="text-muted small">{{ h.name }}</div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- Position -->
+                <div class="d-flex justify-content-between mb-2">
+
+                    <span class="text-muted small">Position</span>
+
+                    <span class="fw-semibold">
+                        {{ h.shares }}
+                    </span>
+
+                </div>
+
+
+                <!-- Price -->
+                <div class="d-flex justify-content-between mb-2">
+
+                    <span class="text-muted small">Price</span>
+
+                    <span class="fw-semibold" data-price-cell>
+                        {{ h.price | usd }}
+                    </span>
+
+                </div>
+
+
+                <!-- Value -->
+                <div class="d-flex justify-content-between mb-2">
+
+                    <span class="text-muted small">Value</span>
+
+                    <span class="fw-semibold" data-value-cell>
+                        {{ h.market_value | usd }}
+                    </span>
+
+                </div>
+
+
+                <!-- P/L -->
+                <div class="d-flex justify-content-between mb-2">
+
+                    <span class="text-muted small">Total P/L</span>
+
+                    <span class="fw-semibold data-pl-cell
+                    {% if h.unrealized_pl >= 0 %}
+                        text-success
+                    {% else %}
+                        text-danger
+                    {% endif %}">
+
+                        {% if h.unrealized_pl >= 0 %}+{% endif %}
+                        {{ h.unrealized_pl | usd }}
+                        ({{ h.unrealized_pct }}%)
+
+                    </span>
+
+                </div>
+
+
+                <!-- Today -->
+                <div class="d-flex justify-content-between mb-2">
+
+                    <span class="text-muted small">Today</span>
+
+                    <span class="fw-semibold data-day-cell
+                    {% if h.today_pl >= 0 %}
+                        text-success
+                    {% else %}
+                        text-danger
+                    {% endif %}">
+
+                        {% if h.today_pl >= 0 %}+{% endif %}
+                        {{ h.today_pl | usd }}
+                        ({{ h.today_pct }}%)
+
+                    </span>
+
+                </div>
+
+            </div>
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    {% else %}
+
+    <!-- Empty State -->
+    <div class="text-center py-5">
+        <div class="fw-bold fs-4 mb-2">
+            No positions yet
+        </div>
+
+        <p class="text-muted mb-0">
+            Start investing to build your portfolio.
+        </p>
+    </div>
+
+    {% endif %}
+
+</main>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/holdings.js') }}"></script>
+{% endblock %}

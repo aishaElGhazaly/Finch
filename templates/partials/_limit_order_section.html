@@ -1,0 +1,53 @@
+{% macro limit_order_section(side) %}
+<div id="{{ side }}LimitOrderSection" class="d-none d-flex flex-column h-100">
+
+    <div class="flex-grow-1">
+        <!-- Quantity -->
+        <div class="mb-4" id="{{ side }}LimitQuantityGroup">
+            <h6 class="fw-semibold mb-2">No. of Shares</h6>
+            <div class="input-group w-auto">
+                <button class="btn btn-outline-secondary" type="button" id="{{ side }}LimitQuantityMinusBtn"><i
+                        class="bi bi-dash"></i></button>
+                <input type="number" class="form-control text-center" id="{{ side }}LimitQuantityInput" value="0"
+                    min="0" style="width: 100px;">
+                <button class="btn btn-outline-secondary" type="button" id="{{ side }}LimitQuantityPlusBtn"><i
+                        class="bi bi-plus"></i></button>
+                <button class="btn btn-dark px-3" type="button" id="{{ side }}LimitQuantityMaxBtn">Max</button>
+            </div>
+        </div>
+
+        <!-- Limit Price -->
+        <div class="mb-4" id="{{ side }}LimitPriceGroup">
+            <h6 class="fw-semibold mb-2">Limit Price (USD)</h6>
+            <div class="input-group w-auto">
+                <span class="input-group-text">$</span>
+                <button class="btn btn-outline-secondary" type="button" id="{{ side }}LimitPriceMinusBtn"><i
+                        class="bi bi-dash"></i></button>
+                <input type="number" class="form-control text-center" id="{{ side }}LimitPriceInput" value="0.00"
+                    min="0" step="0.01" style="width: 120px;">
+                <button class="btn btn-outline-secondary" type="button" id="{{ side }}LimitPricePlusBtn"><i
+                        class="bi bi-plus"></i></button>
+                <button class="btn btn-dark px-3" type="button" id="{{ side }}LimitPriceMktBtn">Mkt</button>
+            </div>
+            <small class="text-muted ms-1">Your order will execute when the market reaches this price.</small>
+        </div>
+
+        <!-- Limit Summary -->
+        <div class="mt-auto" id="{{ side }}LimitSummary">
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Shares:</span>
+                <span class="fw-semibold" id="{{ side }}LimitSummaryShares">0</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Limit Price:</span>
+                <span class="fw-semibold" id="{{ side }}LimitSummaryPrice">$0.00</span>
+            </div>
+            <hr class="my-2">
+            <div class="d-flex justify-content-between">
+                <span class="fw-semibold">Estimated Cost:</span>
+                <span class="fw-bold fs-5" id="{{ side }}LimitSummaryTotal">$0.00</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}

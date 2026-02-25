@@ -1,0 +1,53 @@
+{% extends 'public_layout.html' %}
+{% block title %}Login | Finch{% endblock %}
+
+{% block content %}
+    <main class="d-flex flex-column justify-content-center align-items-center mx-4 py-4">
+        <div class="card border-1 m-3 bg-white form-card" style="max-width: 450px; width:100%;">
+
+            <div class="text-center mb-4">
+                <h2 class="fw-semibold mb-1">Welcome Back, Investor.</h2>
+                <p class="text-muted mb-0">Access your Finch account to continue.</p>
+            </div>
+
+            <form id="loginForm" action="/login" method="post" novalidate>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="mb-3">
+                    <label for="email" class="visually-hidden">Email Address</label>
+
+                    <input autofocus id="email" class="form-control auth-input {% if errors.email %}is-invalid{% endif %}" name="email" placeholder="Email address" type="email" value="{{ form.email or '' }}" autocomplete="email" aria-describedby="emailFeedback" required>
+
+                    <div id="emailFeedback" class="invalid-feedback">
+                        {% if errors.email %}{{ errors.email }}{% endif %}
+                    </div>
+                </div>
+
+                <div class="input-group mb-3">
+                    <div class="d-flex w-100">
+                        <label for="password" class="visually-hidden">Password</label>
+
+                        <input id="password" class="form-control auth-input {% if errors.password %}is-invalid{% endif %}" name="password" placeholder="Password" type="password" autocomplete="current-password" aria-describedby="passwordFeedback" data-password required>
+
+                        <button class="btn btn-outline-secondary password-toggle" type="button" tabindex="-1" aria-label="Toggle password visibility" data-toggle-password>
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    <div id="passwordFeedback" class="invalid-feedback d-block">
+                        {% if errors.password %}{{ errors.password }}{% endif %}
+                    </div>
+                </div>
+
+                {% if errors.form %}
+                    <div class="text-danger small mb-3 text-center">{{ errors.form }}</div>
+                {% endif %}
+
+                <button type="submit" class="btn btn-dark w-100 py-2 fw-semibold auth-btn">Login</button>
+
+                <p class="text-center text-muted small mt-3 mb-0">
+                    Not on Finch? <a href="/signup" class="text-decoration-none fw-bold">Sign Up</a>
+                </p>
+            </form>
+        </div>
+    </main>
+{% endblock %}

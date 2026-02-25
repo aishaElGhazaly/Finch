@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Finch{% endblock %}</title>
+
+        <!-- Bootstrap & Icons -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+        <!-- Favicon -->
+        <link rel="icon" href="{{ url_for('static', filename='assets/icon_light.png') }}">
+
+        <!-- Base Styles -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+
+        {% block head %}{% endblock %}
+    </head>
+
+    <body>
+        <header class="d-flex justify-content-center align-items-center">
+            <a href="/"><img src="{{ url_for('static', filename='assets/logo_dark.png') }}" alt="Finch Logo" height="70"></a>
+        </header>
+
+        <!-- Page Content -->
+        {% block content %}{% endblock %}
+
+        <!-- Footer -->
+        <footer class="py-3 mt-auto text-center small text-muted">
+            &copy; {{ year }} Finch Finance
+        </footer>
+
+        <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+        {% block scripts %}{% endblock %}
+    </body>
+
+</html>

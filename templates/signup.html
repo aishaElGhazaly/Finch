@@ -1,0 +1,91 @@
+{% extends 'public_layout.html' %}
+
+{% block title %}Signup | Finch{% endblock %}
+
+{% block content %}
+    <main class="d-flex flex-column justify-content-center align-items-center mx-4 py-4">
+        <div class="card border-1 m-3 bg-white form-card" style="max-width: 450px; width:100%;">
+
+            <div class="text-center mb-4">
+                <h2 class="fw-semibold mb-1">Welcome, Investor.</h2>
+                <p class="text-muted mb-0">Create your Finch account to get started.</p>
+            </div>
+
+            <form id="signupForm" action="/signup" method="post" novalidate>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="row g-1">
+                    <div class="col-12 col-md-6 mb-3">
+                        <label for="first_name" class="visually-hidden">First Name</label>
+
+                        <input autofocus id="first_name" class="form-control auth-input {% if errors.first_name %}is-invalid{% endif %}" name="first_name" placeholder="First name" type="text" value="{{ form.first_name or '' }}" autocomplete="given-name" aria-describedby="firstNameFeedback" required>
+
+                        <div id="firstNameFeedback" class="invalid-feedback">
+                            {% if errors.first_name %}{{ errors.first_name }}{% endif %}
+                        </div>
+
+                    </div>
+
+                    <div class="col-12 col-md-6 mb-3">
+                        <label for="last_name" class="visually-hidden">Last Name</label>
+
+                        <input id="last_name" class="form-control auth-input {% if errors.last_name %}is-invalid{% endif %}" name="last_name" placeholder="Last name" type="text" value="{{ form.last_name or '' }}" autocomplete="family-name" aria-describedby="lastNameFeedback" required>
+
+                        <div id="lastNameFeedback" class="invalid-feedback">
+                            {% if errors.last_name %}{{ errors.last_name }}{% endif %}
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="visually-hidden">Email Address</label>
+
+                    <input id="email" class="form-control auth-input {% if errors.email %}is-invalid{% endif %}" name="email" placeholder="Email address" type="email" value="{{ form.email or '' }}" autocomplete="email" aria-describedby="emailFeedback" required>
+
+                    <div id="emailFeedback" class="invalid-feedback">
+                        {% if errors.email %}{{ errors.email }}{% endif %}
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+                    <label for="dob" class="visually-hidden">Date of Birth</label>
+
+                    <input id="dob" class="form-control auth-input {% if errors.dob %}is-invalid{% endif %}" name="dob" placeholder="Date of Birth" type="date" value="{{ form.dob or '' }}" autocomplete="bday" aria-describedby="dobFeedback" required>
+
+                    <div id="dobFeedback" class="invalid-feedback">
+                        {% if errors.dob %}{{ errors.dob }}{% endif %}
+                    </div>
+
+                </div>
+
+                <div class="input-group mb-3">
+                    <div class="d-flex w-100">
+                        <label for="password" class="visually-hidden">Password</label>
+
+                        <input id="password" class="form-control auth-input {% if errors.password %}is-invalid{% endif %}" name="password" placeholder="Password" type="password" autocomplete="new-password" aria-describedby="passwordFeedback" data-password required>
+
+                        <button class="btn btn-outline-secondary password-toggle" type="button" tabindex="-1" aria-label="Toggle password visibility" data-toggle-password>
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    <div id="passwordFeedback" class="invalid-feedback d-block">
+                        {% if errors.password %}{{ errors.password }}{% endif %}
+                    </div>
+                </div>
+
+                {% if errors.form %}
+                    <div class="text-danger small mb-3 text-center">{{ errors.form }}</div>
+                {% endif %}
+
+                <button type="submit" class="btn btn-dark w-100 py-2 fw-semibold auth-btn">Create Account</button>
+
+                <p class="text-center text-muted small mt-3 mb-0">
+                    Already have an account? <a href="/login" class="text-decoration-none fw-bold">Log in</a>
+                </p>
+            </form>
+        </div>
+    </main>
+
+{% endblock %}

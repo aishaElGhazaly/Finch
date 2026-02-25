@@ -1,0 +1,241 @@
+{% extends "layout.html" %}
+{% from "partials/_trade_sidebar.html" import trade_sidebar %}
+
+{% block title %}{{ stock.name if stock else "Stock" }} | Finch{% endblock %}
+
+{% block content %}
+<main class="container my-4">
+    {% if error %}
+    <div class="alert alert-warning text-center">{{ error }}</div>
+    {% endif %}
+
+    {% if stock %}
+    <!-- Toggle Switch -->
+    <div class="d-flex justify-content-end mb-3">
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="viewToggle">
+            <label class="form-check-label" for="viewToggle">Advanced Mode</label>
+        </div>
+    </div>
+
+    <!-- Simple Mode -->
+    <div id="symbol-overview" class="mb-5">
+        <div class="tradingview-widget-container w-100">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript"
+                src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js" async>
+                    {
+                        "symbols": [["{{ stock.name }}", "{{ stock.exchange }}:{{ stock.symbol }}|1D"]],
+                            "chartType": "area",
+                                "colorTheme": "light",
+                                    "isTransparent": true,
+                                        "autosize": true,
+                                            "locale": "en",
+                                                "valuesTracking": "1"
+                    }
+                </script>
+        </div>
+    </div>
+
+    <!-- Advanced Mode -->
+    <div id="advanced-divs" class="d-none mb-5">
+        <div id="symbol-info" class="mb-2">
+            <div class="tradingview-widget-container w-100">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript"
+                    src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js" async>
+                        {
+                            "symbol": "{{ stock.exchange }}:{{ stock.symbol }}",
+                                "width": "100%",
+                                    "locale": "en",
+                                        "colorTheme": "light",
+                                            "isTransparent": true
+                        }
+                    </script>
+            </div>
+        </div>
+
+        <div id="advanced-chart">
+            <div class="tradingview-widget-container w-100" style="height: 500px;">
+                <div class="tradingview-widget-container__widget"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Watchlist & Trade Buttons -->
+    <div class="d-flex flex-wrap justify-content-end gap-2 mb-4">
+        <button class="btn btn-outline-dark rounded-circle d-flex align-items-center justify-content-center"
+            style="width: 45px; height: 45px;" id="watchlistBtn" data-symbol="{{ stock.symbol }}">
+            {% if in_watchlist %}
+            <i id="watchlistIcon" class="bi bi-eye-slash"></i>
+            {% else %}
+            <i id="watchlistIcon" class="bi bi-eye"></i>
+            {% endif %}
+        </button>
+
+        <!-- Trade Action Buttons -->
+        <div id="trade-actions" class="d-flex gap-2 flex-grow-1 flex-sm-grow-0">
+            <button class="btn btn-lg rounded-pill fw-bold flex-grow-1 flex-sm-grow-0 px-4 px-sm-5"
+                style="background-color: black; color: white;" data-bs-toggle="offcanvas"
+                data-bs-target="#buySidebar">Buy</button>
+            <!-- Offcanvas Sidebar -->
+            {{ trade_sidebar('buy', stock.symbol, user_cash, 'Cash Available', 'USD') }}
+
+            <button class="btn btn-lg rounded-pill fw-bold flex-grow-1 flex-sm-grow-0 px-4 px-sm-5"
+                style="background-color: black; color: white;" data-bs-toggle="offcanvas"
+                data-bs-target="#sellSidebar">Sell</button>
+            <!-- Offcanvas Sidebar -->
+            {{ trade_sidebar('sell', stock.symbol, user_shares, 'Shares Owned', 'shares') }}
+        </div>
+    </div>
+
+    {% if position %}
+    <div class="card mb-5 border">
+        <div class="card-body py-4">
+
+            <h5 class="fw-bold fs-4 mb-4">Your Position</h5>
+
+            <div class="row g-3 g-md-0 text-center align-items-stretch">
+
+                <!-- Shares -->
+                <div class="col-6 col-md-4 col-lg-2">
+                    <div class="h-100 px-3 d-flex flex-column justify-content-center">
+                        <div class="text-muted small">Shares</div>
+                        <div class="fw-semibold fs-5">{{ position.shares }}</div>
+                    </div>
+                </div>
+
+                <!-- Avg Cost -->
+                <div class="col-6 col-md-4 col-lg-2">
+                    <div class="h-100 px-3 d-flex flex-column justify-content-center border-md-start">
+                        <div class="text-muted small">Avg Cost</div>
+                        <div class="fw-semibold fs-5">{{ position.avg_price | usd }}</div>
+                    </div>
+                </div>
+
+                <!-- Market Price -->
+                <div class="col-6 col-md-4 col-lg-2">
+                    <div class="h-100 px-3 d-flex flex-column justify-content-center border-md-start">
+                        <div class="text-muted small">Market Price</div>
+                        <div class="fw-semibold fs-5">{{ position.market_price | usd }}</div>
+                    </div>
+                </div>
+
+                <!-- Market Value -->
+                <div class="col-6 col-md-6 col-lg-3">
+                    <div class="h-100 px-3 d-flex flex-column justify-content-center border-md-start">
+                        <div class="text-muted small">Market Value</div>
+                        <div class="fw-semibold fs-5">{{ position.market_value | usd }}</div>
+                    </div>
+                </div>
+
+                <!-- Unrealized P/L -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="h-100 px-3 d-flex flex-column justify-content-center border-md-start">
+                        <div class="text-muted small">Unrealized P/L</div>
+                        <div
+                            class="fw-bold fs-5
+                        {% if position.unrealized_pl > 0 %}text-success{% elif position.unrealized_pl < 0 %}text-danger{% else %}text-muted{% endif %}">
+                            {{ position.unrealized_pl | usd }}
+                            <span class="small">({{ position.unrealized_pl_pct | round(2) }}%)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+
+    <!-- Fundamentals -->
+    <div id="fundamental-data" class="mb-5">
+        <div class="tradingview-widget-container w-100">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript"
+                src="https://s3.tradingview.com/external-embedding/embed-widget-financials.js" async>
+                    {
+                        "symbol": "{{ stock.exchange }}:{{ stock.symbol }}",
+                            "colorTheme": "light",
+                                "displayMode": "compact",
+                                    "isTransparent": false,
+                                        "locale": "en",
+                                            "height": 500
+                    }
+                </script>
+        </div>
+    </div>
+
+    <!-- Technical Analysis -->
+    <div id="technical-analysis" class="mb-5">
+        <div class="tradingview-widget-container" style="min-height: 500px;">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript"
+                src="https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js" async>
+                    {
+                        "colorTheme": "light",
+                            "displayMode": "multiple",
+                                "isTransparent": false,
+                                    "locale": "en",
+                                        "interval": "1D",
+                                            "disableInterval": false,
+                                                "width": "100%",
+                                                    "height": 500,
+                                                        "symbol": "{{ stock.exchange }}:{{ stock.symbol }}",
+                                                            "showIntervalTabs": true
+                    }
+                </script>
+        </div>
+    </div>
+
+    <!-- Company Profile + News -->
+    <div class="row g-4 mb-4">
+        <div class="col-12 col-lg-6 mb-s-5" id="company-profile" style="min-height: 500px;">
+            <div class="tradingview-widget-container w-100">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript"
+                    src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-profile.js" async>
+                        {
+                            "symbol": "{{ stock.exchange }}:{{ stock.symbol }}",
+                                "colorTheme": "light",
+                                    "isTransparent": false,
+                                        "locale": "en",
+                                            "height": "100%"
+                        }
+                    </script>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6" id="top-stories" style="min-height: 500px;">
+            <div class="tradingview-widget-container w-100 h-100">
+                <div class="tradingview-widget-container__widget h-100"></div>
+                <script type="text/javascript"
+                    src="https://s3.tradingview.com/external-embedding/embed-widget-timeline.js" async>
+                        {
+                            "displayMode": "compact",
+                                "feedMode": "symbol",
+                                    "symbol": "{{ stock.exchange }}:{{ stock.symbol }}",
+                                        "colorTheme": "light",
+                                            "isTransparent": false,
+                                                "locale": "en",
+                                                    "height": "100%"
+                        }
+                    </script>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</main>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const TRADE_DATA = {
+        symbol: "{{ stock.symbol }}",
+        exchange: "{{ stock.exchange }}",
+        unitPrice: {{ stock.quote }},
+        buyBalance: {{ user_cash }},
+        sellBalance: {{ user_shares }}
+};
+</script>
+<script type="module" src="{{ url_for('static', filename='js/stock.js') }}"></script>
+{% endblock %}

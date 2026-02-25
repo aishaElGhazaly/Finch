@@ -1,0 +1,157 @@
+{% extends "layout.html" %}
+{% block title %}Orders | Finch{% endblock %}
+
+{% block content %}
+<main class="container my-4">
+
+    <!-- Header -->
+    <div class="mb-4">
+        <h2 class="fw-bold m-0">Open Orders</h2>
+        <p class="text-muted mb-0">
+            Review and manage your limit orders.
+        </p>
+    </div>
+
+    {% if orders|length > 0 %}
+    <!-- Controls Card -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body py-3">
+            <div class="row g-3 align-items-center">
+
+                <!-- Search -->
+                <div class="col-12 col-md-3 order-1 order-md-2">
+                    <input type="text" id="orderSearch" class="form-control search-pill" placeholder="Search by symbol">
+                </div>
+
+                <!-- Status Filters -->
+                <div class="col-12 col-md-9 order-2 order-md-1">
+                    <div id="orderStatusFilters" class="d-flex flex-wrap gap-2 filterChips"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= DESKTOP ================= -->
+    <div class="d-none d-md-block table-responsive shadow-sm rounded-4">
+        <table class="table modern-table text-center mb-0 align-middle">
+
+            <thead>
+                <tr>
+                    <th scope="col">Placed</th>
+
+                    <th scope="col" class="d-none d-lg-table-cell">
+                        Filled
+                    </th>
+
+                    <th scope="col">Stock</th>
+
+                    <th scope="col">Type</th>
+
+                    <th scope="col" class="d-none d-sm-table-cell">
+                        Shares
+                    </th>
+
+                    <th scope="col" class="d-none d-md-table-cell">
+                        Limit
+                    </th>
+
+                    <th scope="col" class="d-none d-lg-table-cell">
+                        Filled @
+                    </th>
+
+                    <th scope="col">Total</th>
+
+                    <th scope="col">Status</th>
+
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+
+            <tbody id="ordersTableBody"></tbody>
+
+        </table>
+    </div>
+
+
+    <!-- ================= MOBILE ================= -->
+    <div class="d-md-none" id="ordersMobileList"></div>
+
+
+    <!-- Pagination -->
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center" id="ordersPagination"></ul>
+    </nav>
+
+
+    {% else %}
+
+    <!-- Empty State -->
+    <div class="text-center py-5">
+        <div class="fw-bold fs-4 mb-2">
+            No orders yet
+        </div>
+
+        <p class="text-muted mb-0">
+            Your limit orders will appear here.
+        </p>
+    </div>
+
+    {% endif %}
+
+</main>
+
+
+<!-- Cancel Modal -->
+<div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content border-0 shadow-lg rounded-4">
+
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">
+                    Cancel Order?
+                </h5>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+
+            <div class="modal-body text-center px-4">
+                <p class="text-muted mb-2">
+                    This action cannot be undone.
+                </p>
+
+                <p class="fw-semibold mb-0">
+                    Are you sure you want to cancel this order?
+                </p>
+            </div>
+
+
+            <div class="modal-footer border-0 pb-4">
+
+                <button type="button" class="btn btn-light border" data-bs-dismiss="modal">
+                    Keep Order
+                </button>
+
+                <button id="confirmCancelBtn" class="btn btn-outline-danger shadow-sm">
+                    Cancel Order
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+    window.ORDER_DATA = {{ orders | tojson }};
+</script>
+
+<script src="{{ url_for('static', filename='js/orders.js') }}"></script>
+{% endblock %}

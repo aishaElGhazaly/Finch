@@ -1,0 +1,169 @@
+{% extends "layout.html" %}
+{% block title %}Watchlist | Finch{% endblock %}
+
+{% block content %}
+<main class="container my-4">
+
+    <!-- Header -->
+    <div class="mb-4">
+        <h2 class="fw-bold m-0">Watchlist</h2>
+        <p class="text-muted mb-0">
+            Track stocks you care about.
+        </p>
+    </div>
+
+
+    {% if stocks|length > 0 %}
+
+    <!-- Controls Card -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body py-3">
+            <div class="row g-3 align-items-center">
+
+                <!-- Search -->
+                <div class="col-12 col-md-3 order-1 order-md-2">
+                    <input type="text" id="wlSearch" class="form-control search-pill" placeholder="Search">
+                </div>
+
+                <!-- Sector Filters -->
+                <div class="col-12 col-md-9 order-2 order-md-1">
+                    <div id="wlSectorFilters" class="d-flex flex-wrap gap-2 filterChips"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Meta info -->
+    <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+        <div class="text-muted small">
+            <span id="wlCount">{{ stocks|length }}</span> stocks • Updates every 60 seconds
+        </div>
+    </div>
+    <!-- ================= DESKTOP / TABLET ================= -->
+    <div class="d-none d-md-block table-responsive shadow-sm rounded-4">
+        <table class="table modern-table mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th>Stock</th>
+                    <th>Sector</th>
+
+                    <th class="text-end sortable" data-sort="price">
+                        Price <span class="sort-indicator"></span>
+                    </th>
+
+                    <th class="text-end sortable" data-sort="change_pct">
+                        Change <span class="sort-indicator"></span>
+                    </th>
+
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody id="wlTableBody">
+                {% for s in stocks %}
+                <tr class="clickable-row" data-symbol="{{ s.symbol }}" data-sector="{{ s.sector }}"
+                    data-name="{{ s.name|lower }}" data-price="{{ s.price }}" data-change="{{ s.change }}"
+                    data-change-pct="{{ s.change_pct }}">
+                    <td>
+                        <div class="d-flex align-items-center gap-3 wl-stock-cell">
+                            <img src="https://img.logo.dev/ticker/{{ s.symbol }}?token=pk_StdhioHKQAapZCwTkZ1bgA"
+                                alt="{{ s.symbol }} logo" class="rounded-circle flex-shrink-0" loading="lazy"
+                                style="width: 40px; height: 40px; object-fit: fill;"
+                                onerror="this.style.display='none'">
+
+                            <div class="wl-stock-text">
+                                <div class="fw-semibold">{{ s.symbol }}</div>
+                                <div class="text-muted small">{{ s.name }}</div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>{{ s.sector or "—" }}</td>
+
+                    <td class="text-end fw-semibold" data-price-cell>
+                        {{ s.price | usd }}
+                    </td>
+
+                    <td class="text-end fw-semibold {% if s.change_pct >= 0 %}text-success{% else %}text-danger{% endif %}"
+                        data-change-cell>
+                        {% if s.change_pct >= 0 %}+{% endif %}{{ "%.2f"|format(s.change) }}
+                        <span class="small">
+                            ({% if s.change_pct >= 0 %}+{% endif %}{{ "%.2f"|format(s.change_pct) }}%)
+                        </span>
+                    </td>
+
+                    <td class="text-center">
+                        <button class="btn btn-outline-dark btn-sm rounded-circle wl-remove-btn"
+                            data-symbol="{{ s.symbol }}">
+                            <i class="bi bi-eye-slash"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ================= MOBILE ================= -->
+    <div class="d-md-none">
+        {% for s in stocks %}
+        <div class="card mb-2 shadow-sm rounded-3 clickable-row" data-symbol="{{ s.symbol }}"
+            data-sector="{{ s.sector }}" data-name="{{ s.name|lower }}" data-price="{{ s.price }}"
+            data-change="{{ s.change }}" data-change-pct="{{ s.change_pct }}">
+            <div class="card-body py-3 px-3">
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="https://img.logo.dev/ticker/{{ s.symbol }}?token=pk_StdhioHKQAapZCwTkZ1bgA"
+                            alt="{{ s.symbol }} logo" class="rounded-circle flex-shrink-0" loading="lazy"
+                            style="width: 32px; height: 32px; object-fit: fill;" onerror="this.style.display='none'">
+
+                        <div>
+                            <div class="fw-semibold">{{ s.symbol }}</div>
+                            <div class="text-muted small">{{ s.name }}</div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-outline-dark btn-sm rounded-circle wl-remove-btn"
+                        data-symbol="{{ s.symbol }}">
+                        <i class="bi bi-eye-slash"></i>
+                    </button>
+
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold" data-price-cell>{{ s.price | usd }}</span>
+
+                    <span class="fw-semibold {% if s.change_pct >= 0 %}text-success{% else %}text-danger{% endif %}"
+                        data-change-cell>
+                        {% if s.change_pct >= 0 %}+{% endif %}{{ "%.2f"|format(s.change) }}
+                        ({{ "%.2f"|format(s.change_pct) }}%)
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+
+    <!-- Empty State -->
+    <div class="text-center py-5">
+        <div class="fw-bold fs-4 mb-2">
+            Your watchlist is empty
+        </div>
+
+        <p class="text-muted mb-0">
+            Add stocks to your watchlist to monitor prices and trends.
+        </p>
+    </div>
+
+    {% endif %}
+
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/watchlist.js') }}"></script>
+{% endblock %}

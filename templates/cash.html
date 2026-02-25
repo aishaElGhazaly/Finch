@@ -1,0 +1,158 @@
+{% extends "layout.html" %}
+{% block title %}Cash | Finch{% endblock %}
+
+{% block content %}
+<main class="container my-4">
+
+    <!-- Balance Section -->
+    <div class="text-center mb-5">
+        <h1 class="fw-bold display-5 mb-1">{{ balance | usd }}</h1>
+        <p class="text-muted fs-5">Current Balance</p>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-pills justify-content-center mb-5 gap-2 flex-wrap">
+        <li class="nav-item">
+            <button type="button" id="depositTab" class="btn btn-dark px-4 py-2 active">Deposit</button>
+        </li>
+        <li class="nav-item">
+            <button type="button" id="withdrawTab" class="btn btn-outline-dark px-4 py-2">Withdraw</button>
+        </li>
+        <li class="nav-item">
+            <button type="button" id="historyTab" class="btn btn-outline-dark px-4 py-2">History</button>
+        </li>
+    </ul>
+
+    <!-- Deposit Card -->
+    <div id="depositForm" class="card shadow-sm p-4 p-md-5 mx-auto mb-5" style="max-width: 500px; border-radius: 20px;">
+        <form action="{{ url_for('cash.cash_post') }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="action" value="deposit">
+
+            <label class="form-label fw-semibold mb-2">Amount to Deposit</label>
+
+            <div class="input-group mb-3 overflow-hidden border">
+                <input type="number" inputmode="decimal" step="any" name="amount" id="depositAmount" min="1"
+                    max="{{ [remaining_daily, remaining_weekly] | min }}" class="form-control border-0 px-3"
+                    placeholder="Enter amount..." required>
+                <button type="button" class="btn btn-outline-dark fw-bold px-4" id="depositMaxBtn">Max</button>
+            </div>
+
+            <!-- Quick Buttons Container -->
+            <div class="d-flex flex-wrap justify-content-center gap-2 mb-4" id="depositQuickButtons"></div>
+
+            <!-- Limits -->
+            <div class="text-center mb-3">
+                <p class="text-muted small mb-1">
+                    Daily Remaining: <strong>{{ remaining_daily | usd }}</strong>
+                </p>
+                <p class="text-muted small mb-0">
+                    Weekly Remaining: <strong>{{ remaining_weekly | usd }}</strong>
+                </p>
+            </div>
+
+            <p id="depositLimitMsg" class="text-danger small d-none mb-3"></p>
+
+            <button class="btn btn-dark w-100 py-2 fw-semibold rounded-pill" id="depositSubmitBtn">Deposit</button>
+        </form>
+    </div>
+
+    <!-- Withdraw Card -->
+    <div id="withdrawForm" class="card shadow-sm p-4 p-md-5 mx-auto mb-5 d-none"
+        style="max-width: 500px; border-radius: 20px;">
+        <form action="{{ url_for('cash.cash_post') }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="action" value="withdraw">
+
+            <label class="form-label fw-semibold mb-2">Amount to Withdraw</label>
+
+            <div class="input-group mb-3 overflow-hidden border">
+                <input type="number" inputmode="decimal" step="any" name="amount" id="withdrawAmount" min="1"
+                    max="{{ balance }}" class="form-control border-0 px-3" placeholder="Enter amount..." required>
+                <button type="button" class="btn btn-outline-dark fw-bold px-4" id="withdrawMaxBtn">Max</button>
+            </div>
+
+            <!-- Quick Buttons Container -->
+            <div class="d-flex flex-wrap justify-content-center gap-2 mb-4" id="withdrawQuickButtons"></div>
+
+            <p id="withdrawLimitMsg" class="text-danger small d-none mb-3"></p>
+
+            <button class="btn btn-dark w-100 py-2 fw-semibold rounded-pill" id="withdrawSubmitBtn">Withdraw</button>
+        </form>
+    </div>
+
+    <!-- History Section -->
+    <div id="historySection" class="d-none">
+
+        <div
+            class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+            <h3 class="fw-bold m-0">Transaction History</h3>
+
+            {% if transactions|length > 0 %}
+            <select id="historyRange" class="form-select d-none d-md-block" style="max-width: 200px;">
+                <option value="30">Last 30 Days</option>
+                <option value="90">Last 90 Days</option>
+                <option value="365">Last 365 Days</option>
+                <option value="all">All Time</option>
+            </select>
+            {% endif %}
+        </div>
+
+        {% if transactions|length > 0 %}
+
+        <!-- ================= DESKTOP / TABLET ================= -->
+        <div class="d-none d-md-block table-responsive shadow-sm rounded-4">
+            <table class="table modern-table mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Balance After</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- ================= MOBILE ================= -->
+        <div class="d-md-none" id="historyMobileList"></div>
+
+
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center" id="historyPagination"></ul>
+        </nav>
+
+        {% else %}
+
+        <!-- ================= EMPTY STATE ================= -->
+        <div class="text-center py-5">
+            <div class="fw-bold fs-4 mb-2">
+                No transactions yet
+            </div>
+
+            <p class="text-muted mb-0">
+                Your deposits and withdrawals will appear here once you start using your account.
+            </p>
+        </div>
+
+        {% endif %}
+    </div>
+
+</main>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.CASH_DATA = {{ transactions | tojson }};
+</script>
+<script>
+    const REMAINING_DAILY = {{ remaining_daily }};
+    const REMAINING_WEEKLY = {{ remaining_weekly }};
+    const WITHDRAW_MAX_BALANCE = {{ balance }};
+    const DEPOSIT_MAX_BALANCE = Math.min(REMAINING_DAILY, REMAINING_WEEKLY);
+</script>
+<script type="module" src="{{ url_for('static', filename='js/cash.js') }}"></script>
+{% endblock %}

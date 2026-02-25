@@ -1,0 +1,88 @@
+{% macro market_order_section(side) %}
+<div id="{{ side }}MarketOrderSection" class="d-none d-flex flex-column h-100">
+
+    <div class="flex-grow-1">
+        <!-- Buy In -->
+        {%if side == 'buy'%}
+        <div class="mb-4 mt-3" id="{{ side }}InSection">
+            <h6 class="fw-semibold mb-3">{{ side|capitalize }} in</h6>
+            <div class="btn-group w-100" role="group" id="{{ side }}InToggle">
+                <input type="radio" class="btn-check" name="{{ side }}In" id="{{ side }}InShares" autocomplete="off"
+                    checked>
+                <label class="btn btn-outline-dark" for="{{ side }}InShares">
+                    <i class="bi bi-graph-up me-1"></i> Shares
+                </label>
+                <input type="radio" class="btn-check" name="{{ side }}In" id="{{ side }}InCash" autocomplete="off">
+                <label class="btn btn-outline-dark" for="{{ side }}InCash">
+                    <i class="bi bi-cash-stack me-1"></i> Cash
+                </label>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Shares Input -->
+        <div class="mb-4" id="{{ side }}MarketSharesGroup">
+            <h6 class="mb-3 fw-semibold">No. of shares</h6>
+            <div class="input-group w-auto">
+                <button class="btn btn-outline-secondary" type="button" id="{{ side }}MarketSharesMinusBtn"><i
+                        class="bi bi-dash"></i></button>
+                <input type="number" class="form-control text-center" id="{{ side }}MarketSharesInput" value="0" min="0"
+                    style="width: 100px;">
+                <button class="btn btn-outline-secondary" type="button" id="{{ side }}MarketSharesPlusBtn"><i
+                        class="bi bi-plus"></i></button>
+                <button class="btn btn-dark px-3" type="button" id="{{ side }}MarketSharesMaxBtn">Max</button>
+            </div>
+        </div>
+
+        <!-- Market Order Summary: Shares Mode -->
+        <div class="mt-auto" id="{{ side }}MarketSharesSummary">
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Shares:</span>
+                <span class="fw-semibold" id="{{ side }}MarketSummaryShares">0</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Unit Price:</span>
+                <span class="fw-semibold" id="{{ side }}MarketSummaryPrice">$0.00</span>
+            </div>
+            <hr class="my-2">
+            <div class="d-flex justify-content-between">
+                {% if side == 'buy' %}
+                <span class="fw-semibold">Total Cost:</span>
+                {% elif side == 'sell' %}
+                <span class="fw-semibold">Total Proceeds:</span>
+                {% endif %}
+                <span class="fw-bold fs-5" id="{{ side }}MarketSummaryTotal">$0.00</span>
+            </div>
+        </div>
+
+        {% if side == 'buy' %}
+        <!-- Cash Input (Buy Only) -->
+        <div class="mb-4 d-none" id="{{ side }}MarketCashGroup">
+            <h6 class="mb-3 fw-semibold">Amount (USD)</h6>
+            <div class="input-group w-auto">
+                <input type="number" class="form-control text-center" id="{{ side }}MarketCashInput" value="0" min="0"
+                    style="width: 100px;">
+                <button class="btn btn-dark px-3" type="button" id="{{ side }}MarketCashMaxBtn">Max</button>
+            </div>
+        </div>
+
+        <!-- Market Order Summary: Cash Mode -->
+        <div class="mt-auto d-none" id="{{ side }}MarketCashSummary">
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Unit Price:</span>
+                <span class="fw-semibold" id="{{ side }}MarketCashSummaryPrice">$0.00</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Total Cost:</span>
+                <span class="fw-semibold" id="{{ side }}MarketCashSummaryTotal">$0.00</span>
+            </div>
+            <hr class="my-2">
+            <div class="d-flex justify-content-between">
+                <span class="fw-semibold">Total Shares:</span>
+                <span class="fw-bold fs-5" id="{{ side }}MarketCashSummaryShares">0</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}

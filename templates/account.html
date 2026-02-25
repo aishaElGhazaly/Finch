@@ -1,0 +1,145 @@
+{% extends "layout.html" %}
+{% block title %}Account | Finch{% endblock %}
+{% block content %}
+
+    <main class="container my-4 my-md-5" style="max-width: 800px;">
+        <h2 class="fw-bold mb-4 text-dark">Account</h2>
+
+    <!-- ================= ACCOUNT DETAILS ================= -->
+        <section class="bg-white rounded-4 shadow-sm p-3 p-md-4 mb-3 mb-md-4">
+            <h6 class="text-uppercase text-muted fw-semibold mb-3 small">
+                Account Details
+            </h6>
+
+        <!-- Name -->
+            <div class="d-flex flex-column flex-md-row align-items-md-center py-3 border-bottom gap-2">
+                <div class="text-muted col-md-3 mb-1 mb-md-0">Name</div>
+                <div class="d-flex align-items-center gap-2 flex-grow-1">
+                    <div class="fw-medium flex-grow-1" data-field="name">
+                        {{ user.first_name }} {{ user.last_name }}
+                    </div>
+                    <button class="btn btn-sm btn-outline-dark p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" data-action="edit-name" aria-label="Change name">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                </div>
+            </div>
+
+        <!-- Email -->
+            <div class="d-flex flex-column flex-md-row align-items-md-center py-3 border-bottom gap-2">
+                <div class="text-muted col-md-3 mb-1 mb-md-0">Email</div>
+                <div class="d-flex align-items-center gap-2 flex-grow-1">
+                    <div class="fw-medium flex-grow-1" data-field="email">
+                        {{ user.email }}
+                    </div>
+                    <button class="btn btn-sm btn-outline-dark p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" data-action="edit-email" aria-label="Update email">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                </div>
+            </div>
+
+        <!-- DOB -->
+            <div class="d-flex flex-column flex-md-row align-items-md-center py-3 gap-2">
+                <div class="text-muted col-md-3 mb-1 mb-md-0">Date of Birth</div>
+                <div class="fw-medium flex-grow-1">
+                    {{ user.dob | dob }}
+                </div>
+            </div>
+        </section>
+
+    <!-- ================= SECURITY ================= -->
+        <section class="bg-white rounded-4 shadow-sm p-3 p-md-4 mb-3 mb-md-4">
+            <h6 class="text-uppercase text-muted fw-semibold mb-3 small">
+                Security
+            </h6>
+
+            <div class="d-flex flex-column flex-md-row align-items-md-center py-3 gap-2">
+                <div class="text-muted col-md-3 mb-1 mb-md-0">Password</div>
+                <div class="d-flex align-items-center gap-2 flex-grow-1">
+                    <div class="fw-medium flex-grow-1" aria-hidden="true">
+                        ••••••••
+                    </div>
+                    <button class="btn btn-sm btn-outline-dark p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" data-action="edit-password" aria-label="Change password">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    <!-- ================= DANGER ZONE ================= -->
+        <section class="bg-white rounded-4 shadow-sm p-3 p-md-4 border border-danger">
+            <h6 class="text-uppercase text-danger fw-semibold mb-3 small">
+                Danger Zone
+            </h6>
+
+            <div class="d-flex flex-column flex-md-row align-items-start gap-3">
+                <div class="flex-grow-1">
+                    <div class="fw-semibold mb-1">Delete Account</div>
+                    <div class="text-muted small">
+                        Permanently delete your account and all associated data.
+                        This action cannot be undone.
+                    </div>
+                </div>
+                <div class="ms-md-auto align-self-md-end">
+                    <button class="btn btn-outline-danger btn-sm" data-action="delete-account">
+                        Delete Account
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+<!-- ================= ACCOUNT MODAL ================= -->
+    <div class="modal fade" id="accountModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4">
+                <form id="accountModalForm" novalidate>
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="accountModalTitle"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div id="accountModalFields"></div>
+                        <div id="accountModalError" class="text-danger small d-none mt-2" role="alert"></div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button class="btn btn-dark" id="accountModalSubmit" disabled>
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<!-- ================= FIELD TEMPLATES ================= -->
+    <template id="field-text">
+        <div class="mb-3">
+            <label class="form-label"></label>
+            <input type="text" class="form-control" aria-invalid="false">
+            <div class="invalid-feedback" aria-live="polite"></div>
+        </div>
+    </template>
+
+    <template id="field-password">
+        <div class="mb-3">
+            <label class="form-label"></label>
+            <div class="input-group">
+                <input type="password" class="form-control" aria-invalid="false">
+                <button type="button" class="btn btn-outline-secondary password-toggle" tabindex="-1" aria-label="Toggle password visibility">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </div>
+            <div class="invalid-feedback" aria-live="polite"></div>
+        </div>
+    </template>
+
+{% endblock %}
+
+{% block scripts %}
+    <script type="module" src="{{ url_for('static', filename='js/account.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,177 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Noto+Sans+Arabic:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Spectral:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    font-family: 'Inter', 'Roboto', sans-serif;
+    background-color: white;
+    color: #212529;
+    margin: 0;
+}
+
+main {
+    flex: 1;
+}
+
+.container {
+    width: 85%;
+}
+
+/* --------------------------------------------- */
+/* TABLE                                         */
+/* --------------------------------------------- */
+
+.modern-table thead th {
+    background: #111;
+    color: #fff;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    border: none;
+    letter-spacing: 0.5px;
+    padding: 1rem;
+    user-select: none;
+}
+
+.modern-table tbody td {
+    vertical-align: middle;
+    padding: 1rem;
+    border-top: 1px solid #e6e6e6;
+}
+
+.table td {
+    padding-top: .75rem;
+    padding-bottom: .75rem;
+}
+
+.cash-date-mobile {
+    white-space: nowrap;
+}
+
+a.trade-link,
+a.account-link {
+    color: #000;
+    text-decoration: none;
+}
+
+a.trade-link:hover,
+a.account-link:hover {
+    color: #000;
+    text-decoration: none;
+}
+
+.clickable-row {
+    cursor: pointer;
+}
+
+/* --------------------------------------------- */
+/* PAGINATION                                    */
+/* --------------------------------------------- */
+.pagination .page-link {
+    color: #000;
+    border-color: #000;
+    background-color: #fff;
+}
+
+.pagination .page-link:hover {
+    background-color: #000;
+    color: #fff;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #000;
+    border-color: #000;
+    color: #fff;
+}
+
+/* Disabled pagination */
+.pagination .page-item.disabled .page-link {
+    color: #999;
+    border-color: #ddd;
+}
+
+/* --------------------------------------------- */
+/* FILTER CHIPS                                  */
+/* --------------------------------------------- */
+
+.filterChips .btn {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.75rem;
+    opacity: 0.85;
+}
+
+.filterChips .btn.active {
+    opacity: 1;
+    font-weight: 600;
+}
+
+
+/* --------------------------------------------- */
+/* PORTFOLIO CARDS                               */
+/* --------------------------------------------- */
+
+.card-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #6c757d;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    margin-bottom: .35rem;
+}
+
+
+.card-value {
+    font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+    font-weight: 700;
+    line-height: 1.2;
+    word-break: break-word;
+}
+
+.card-pct {
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-left: .25rem;
+    white-space: nowrap;
+}
+
+.chart-wrapper {
+    position: relative;
+    height: 350px; /* Adjust to taste */
+    width: 100%;
+}
+
+/* --------------------------------------------- */
+/* CARD FOOTER LINK (Animated Underline)        */
+/* --------------------------------------------- */
+
+.card-footer-link {
+    position: relative;
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #000;
+    text-decoration: none;
+    padding-bottom: 2px;
+}
+
+/* The animated line */
+.card-footer-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0%;
+    height: 2px;
+    background-color: #000;
+    transition: width 0.25s ease;
+}
+
+/* Hover effect */
+.card-footer-link:hover::after {
+    width: 100%;
+}
